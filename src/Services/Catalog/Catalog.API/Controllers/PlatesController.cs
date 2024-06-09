@@ -22,6 +22,7 @@ public class PlatesController : Controller
 			(orderAscending ? dbContext.Plates.OrderBy(SortBy(orderBy)) : dbContext.Plates.OrderByDescending(SortBy(orderBy)))
 			.ThenBy(x => x.Id)
 			.Where(FilterBy(age, initials))
+			.Where(x => !x.IsReserved)
 			.Skip(page * NUMBER_OF_PLATES)
 			.Take(NUMBER_OF_PLATES)
 			.Select(x => new
