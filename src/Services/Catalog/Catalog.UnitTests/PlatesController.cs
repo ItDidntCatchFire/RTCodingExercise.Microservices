@@ -1,17 +1,16 @@
+using Catalog.API.Data;
+using Catalog.Domain;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using Catalog.API.Data;
-using Catalog.Domain;
-using Microsoft.AspNetCore.Mvc;
 using Xunit;
-using Moq;
-using Moq.EntityFrameworkCore;
 
 namespace Catalog.UnitTests
 {
-    public class PlatesController
+	public class PlatesController
     {
         [Fact]
         public void GetAllPlates()
@@ -56,7 +55,7 @@ namespace Catalog.UnitTests
 
             var actualPlates =  platesController.GetPlates();
 
-            var expectedPlates = myEntities.Select(x => new Plate()
+            var expectedPlates = myEntities.Select(x => new
             {
                 Registration = x.Registration,
                 PurchasePrice = x.PurchasePrice,
@@ -113,7 +112,7 @@ namespace Catalog.UnitTests
 
             var actualPlates =  platesController.GetPlates();
 
-            var expectedPlates = myEntities.Select(x => new Plate()
+            var expectedPlates = myEntities.Select(x => new
             {
                 Registration = x.Registration,
                 PurchasePrice = x.PurchasePrice,
@@ -128,7 +127,7 @@ namespace Catalog.UnitTests
             
             
             
-            myEntities.Add( new Plate() {
+            myEntities.Add(new Plate() {
                 Id = Guid.Parse("7C88B586-AABA-400A-8EF2-AF2073FC0CB2"),
                 Registration = "M66VEY",
                 PurchasePrice = 469.26m,
@@ -136,8 +135,17 @@ namespace Catalog.UnitTests
                 Numbers = 66,
                 Letters = "MCV"
             });
-            
-            actualPlates =  platesController.GetPlates();
+
+
+			expectedPlates = myEntities.Select(x => new
+			{
+				Registration = x.Registration,
+				PurchasePrice = x.PurchasePrice,
+				SalePrice = x.SalePrice
+			});
+
+
+			actualPlates =  platesController.GetPlates();
             
             // assert
             okResult = Assert.IsType<OkObjectResult>(actualPlates);

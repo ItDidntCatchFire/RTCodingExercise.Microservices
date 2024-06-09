@@ -1,5 +1,7 @@
 namespace Catalog.API.Controllers;
 
+[ApiController]
+[Route("[controller]")]
 public class PlatesController : Controller
 {
     public ApplicationDbContext dbContext;
@@ -9,8 +11,16 @@ public class PlatesController : Controller
         dbContext = _context ;
     }
 
+    [HttpGet("GetPlates")]
     public IActionResult GetPlates()
     {
-        throw new NotImplementedException();
+        var plates = dbContext.Plates.Select(x => new
+        {
+            Registration = x.Registration,
+            PurchasePrice = x.PurchasePrice,
+            SalePrice = x.SalePrice
+        });
+
+        return Ok(plates);
     }
 }
