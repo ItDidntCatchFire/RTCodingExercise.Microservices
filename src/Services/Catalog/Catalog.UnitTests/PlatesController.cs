@@ -54,12 +54,14 @@ namespace Catalog.UnitTests
 
             var actualPlates =  platesController.GetPlates();
 
-            var expectedPlates = myEntities.Select(x => new
-            {
-                Registration = x.Registration,
-                PurchasePrice = x.PurchasePrice,
-				SalePrice = x.CalculateSalesPrice()
-			});
+            var expectedPlates = myEntities
+				.OrderBy(x => x.Id)
+				.Select(x => new
+                {
+                    Registration = x.Registration,
+                    PurchasePrice = x.PurchasePrice,
+				    SalePrice = x.CalculateSalesPrice()
+			    });
             
             // assert
             var okResult = Assert.IsType<OkObjectResult>(actualPlates);
@@ -111,15 +113,17 @@ namespace Catalog.UnitTests
 
             var actualPlates =  platesController.GetPlates();
 
-            var expectedPlates = myEntities.Select(x => new
-            {
-                Registration = x.Registration,
-                PurchasePrice = x.PurchasePrice,
-				SalePrice = x.CalculateSalesPrice()
-			});
-            
-            // assert
-            var okResult = Assert.IsType<OkObjectResult>(actualPlates);
+            var expectedPlates = myEntities
+                .OrderBy(x => x.Id)
+				.Select(x => new
+				{
+					Registration = x.Registration,
+					PurchasePrice = x.PurchasePrice,
+					SalePrice = x.CalculateSalesPrice()
+				});
+
+			// assert
+			var okResult = Assert.IsType<OkObjectResult>(actualPlates);
             Assert.NotNull(actualPlates);
             Assert.Equal(200, okResult.StatusCode);
             Assert.Equal(JsonSerializer.Serialize(expectedPlates), JsonSerializer.Serialize(okResult.Value));
@@ -136,12 +140,14 @@ namespace Catalog.UnitTests
             });
 
 
-			expectedPlates = myEntities.Select(x => new
-			{
-				Registration = x.Registration,
-				PurchasePrice = x.PurchasePrice,
-				SalePrice = x.CalculateSalesPrice()
-			});
+			expectedPlates = myEntities
+                .OrderBy(x => x.Id)
+				.Select(x => new
+				{
+					Registration = x.Registration,
+					PurchasePrice = x.PurchasePrice,
+					SalePrice = x.CalculateSalesPrice()
+				});
 
 
 			actualPlates =  platesController.GetPlates();
@@ -152,5 +158,94 @@ namespace Catalog.UnitTests
             Assert.Equal(200, okResult.StatusCode);
             Assert.Equal(JsonSerializer.Serialize(expectedPlates), JsonSerializer.Serialize(okResult.Value));
         }
-    }
+
+        [Fact]
+        public void GetAllPlates_Paged_Take()
+        {
+            // Initialize a list of MyEntity objects to back the DbSet with.
+            var myEntities = new List<Domain.Plate>();
+
+            //Create 21 Plates
+            for (int i = 0; i < 21; i++)
+                myEntities.Add(new()
+                {
+                    Id = Guid.NewGuid(),
+                });
+
+
+			// Create a mock DbContext.
+			var dbContext = new Mock<ApplicationDbContext>();
+
+			// Create a mock DbSet.
+			var dbSet = MockDbSetFactory.Create(myEntities);
+
+			// Set up the MyEntities property so it returns the mocked DbSet.
+			dbContext.Setup(o => o.Plates).Returns(dbSet.Object);
+
+			var platesController = new Catalog.API.Controllers.PlatesController(dbContext.Object);
+
+			var actualPlates = platesController.GetPlates();
+
+			var expectedPlates = myEntities
+			   .OrderBy(x => x.Id)
+               .Take(20)
+			   .Select(x => new
+			   {
+				   Registration = x.Registration,
+				   PurchasePrice = x.PurchasePrice,
+				   SalePrice = x.CalculateSalesPrice()
+			   });
+
+			// assert
+			var okResult = Assert.IsType<OkObjectResult>(actualPlates);
+			Assert.NotNull(actualPlates);
+			Assert.Equal(200, okResult.StatusCode);
+			Assert.Equal(JsonSerializer.Serialize(expectedPlates), JsonSerializer.Serialize(okResult.Value));
+		}
+
+		[Fact]
+		public void GetAllPlates_Paged_Skip()
+		{
+			// Initialize a list of MyEntity objects to back the DbSet with.
+			var myEntities = new List<Domain.Plate>();
+
+			//Create 21 Plates
+			for (int i = 0; i < 21; i++)
+				myEntities.Add(new()
+				{
+					Id = Guid.NewGuid(),
+				});
+
+
+			// Create a mock DbContext.
+			var dbContext = new Mock<ApplicationDbContext>();
+
+			// Create a mock DbSet.
+			var dbSet = MockDbSetFactory.Create(myEntities);
+
+			// Set up the MyEntities property so it returns the mocked DbSet.
+			dbContext.Setup(o => o.Plates).Returns(dbSet.Object);
+
+			var platesController = new Catalog.API.Controllers.PlatesController(dbContext.Object);
+
+			var actualPlates = platesController.GetPlates(1);
+
+			var expectedPlates = myEntities
+			   .OrderBy(x => x.Id)
+               .Skip(20)
+			   .Take(20)
+			   .Select(x => new
+			   {
+				   Registration = x.Registration,
+				   PurchasePrice = x.PurchasePrice,
+				   SalePrice = x.CalculateSalesPrice()
+			   });
+
+			// assert
+			var okResult = Assert.IsType<OkObjectResult>(actualPlates);
+			Assert.NotNull(actualPlates);
+			Assert.Equal(200, okResult.StatusCode);
+			Assert.Equal(JsonSerializer.Serialize(expectedPlates), JsonSerializer.Serialize(okResult.Value));
+		}
+	}
 }

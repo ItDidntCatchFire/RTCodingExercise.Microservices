@@ -4,7 +4,9 @@ namespace Catalog.API.Controllers;
 [Route("[controller]")]
 public class PlatesController : Controller
 {
-    public ApplicationDbContext dbContext;
+	private const int NUMBER_OF_PLATES = 20;
+
+	public ApplicationDbContext dbContext;
 
     public PlatesController(ApplicationDbContext _context)
     {
@@ -12,21 +14,19 @@ public class PlatesController : Controller
     }
 
     [HttpGet("GetPlates")]
-    public IActionResult GetPlates()
+    public IActionResult GetPlates(int page = 0)
     {
-        var plates = dbContext.Plates.Select(x => new
-        {
-            Registration = x.Registration,
-            PurchasePrice = x.PurchasePrice,
-            SalePrice = x.CalculateSalesPrice()
-        });
+        var plates = dbContext.Plates
+			.OrderBy(x => x.Id)
+			.Skip(page * NUMBER_OF_PLATES)
+			.Take(NUMBER_OF_PLATES)
+            .Select(x => new
+            {
+                Registration = x.Registration,
+                PurchasePrice = x.PurchasePrice,
+                SalePrice = x.CalculateSalesPrice()
+            });
 
         return Ok(plates);
     }
-
-
-
-
-
-
 }
