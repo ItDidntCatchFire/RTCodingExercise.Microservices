@@ -18,9 +18,15 @@ public class PlatesController : Controller
         {
             Registration = x.Registration,
             PurchasePrice = x.PurchasePrice,
-            SalePrice = x.SalePrice
+            SalePrice = x.CalculateSalesPrice()
         });
 
         return Ok(plates);
     }
+
+
+
+
+
+
 }
