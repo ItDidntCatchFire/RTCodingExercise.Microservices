@@ -258,7 +258,7 @@ namespace Catalog.UnitTests
 		[InlineData("saleprice", true)]
 		[InlineData("saleprice", false)]
 		[Theory]
-		public void GetAllPlatesOrderBy(string orderBy, bool ascending)
+		public void GetAllPlates_OrderBy(string orderBy, bool ascending)
         {
 			// Initialize a list of MyEntity objects to back the DbSet with.
 			var myEntities = new List<Domain.Plate>()
@@ -315,6 +315,85 @@ namespace Catalog.UnitTests
 			Assert.Equal(200, okResult.StatusCode);
 			Assert.Equal(JsonSerializer.Serialize(expectedPlates), JsonSerializer.Serialize(okResult.Value));
 		}
+
+
+		[InlineData(-1, "")]
+		[InlineData(-1, " ")] //Check trimming is working correctly
+		[InlineData(-1, "	")]
+		[InlineData(-1, "a")]
+		[InlineData(1, "")]
+		[InlineData(44, "")]
+		[InlineData(-1, "TAG")]
+		[InlineData(44, "TAG")]
+		[InlineData(44, "TAG ")] //Check trimming is working correctly
+		[InlineData(44, " TAG ")] //Check trimming is working correctly
+		[Theory]
+		public void GetAllPlates_Filter(int age, string initials)
+		{
+			// Initialize a list of MyEntity objects to back the DbSet with.
+			var myEntities = new List<Domain.Plate>()
+			{
+				new Domain.Plate() {
+					Id = Guid.Parse("0812851E-3EC3-4D12-BAF6-C9F0E6DC2F76"),
+					Registration = "T44GUE",
+					PurchasePrice = 2722.51m,
+					SalePrice = 8995.00m,
+					Numbers = 44,
+					Letters = "TAG"
+			}, new Domain.Plate() {
+					Id = Guid.Parse("DF81D7FC-319B-46A8-AB66-2574B4169C3D"),
+					Registration = "M44BEY",
+					PurchasePrice = 859.10m,
+					SalePrice = 8995.00m,
+					Numbers = 44,
+					Letters = "MAB"
+			}, new Domain.Plate() {
+					Id = Guid.Parse("0E9C83BF-94E2-484A-97CB-A8B06E3410FD"),
+					Registration = "P777PER",
+					PurchasePrice = 1494.08m,
+					SalePrice = 4995.00m,
+					Numbers = 777,
+					Letters = "PYP"
+				}
+			};
+
+			// Create a mock DbContext.
+			var dbContext = new Mock<ApplicationDbContext>();
+
+			// Create a mock DbSet.
+			var dbSet = MockDbSetFactory.Create(myEntities);
+
+			// Set up the MyEntities property so it returns the mocked DbSet.
+			dbContext.Setup(o => o.Plates).Returns(dbSet.Object);
+
+			var platesController = new Catalog.API.Controllers.PlatesController(dbContext.Object);
+
+			var actualPlates = platesController.GetPlates(age: age, initials: initials);
+
+			if (age > -1)
+				myEntities = myEntities.Where(x => x.Numbers == age).ToList();
+
+			if (!string.IsNullOrEmpty(initials.Trim()))
+				myEntities = myEntities.Where(x => x.Letters.ToLower() == initials.Trim().ToLower()).ToList();
+
+			var expectedPlates = myEntities
+				.OrderBy(x => x.Id)
+				.Select(x => new
+				{
+					Registration = x.Registration,
+					PurchasePrice = x.PurchasePrice,
+					SalePrice = x.CalculateSalesPrice()
+				});
+
+			// assert
+			var okResult = Assert.IsType<OkObjectResult>(actualPlates);
+			Assert.NotNull(actualPlates);
+			Assert.Equal(200, okResult.StatusCode);
+			Assert.Equal(JsonSerializer.Serialize(expectedPlates), JsonSerializer.Serialize(okResult.Value));
+		}
+
+
+
 
 		private List<Domain.Plate> OrderByGenerator(List<Domain.Plate> plates, string orderBy, bool asc)
 		{
