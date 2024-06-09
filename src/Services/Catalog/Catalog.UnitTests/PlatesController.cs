@@ -298,11 +298,10 @@ namespace Catalog.UnitTests
 
 			var platesController = new Catalog.API.Controllers.PlatesController(dbContext.Object);
 
-			var actualPlates = platesController.GetPlates();
+			var actualPlates = platesController.GetPlates(orderBy: orderBy, orderAscending: ascending);
 
-			OrderByGenerator(myEntities, orderBy, ascending);
+			myEntities = OrderByGenerator(myEntities, orderBy, ascending);
 			var expectedPlates = myEntities
-				.OrderBy(x => x.Id)
 				.Select(x => new
 				{
 					Registration = x.Registration,
@@ -317,10 +316,9 @@ namespace Catalog.UnitTests
 			Assert.Equal(JsonSerializer.Serialize(expectedPlates), JsonSerializer.Serialize(okResult.Value));
 		}
 
-
-		private void OrderByGenerator(List<Domain.Plate> plates, string orderBy, bool asc)
+		private List<Domain.Plate> OrderByGenerator(List<Domain.Plate> plates, string orderBy, bool asc)
 		{
-			plates = orderBy switch
+			return orderBy switch
 			{
 				"registration" => (asc ? plates.OrderBy(x => x.Registration) : plates.OrderByDescending(x => x.Registration)).ToList(),
 				"purchaseprice" => (asc ? plates.OrderBy(x => x.PurchasePrice) : plates.OrderByDescending(x => x.PurchasePrice)).ToList(),
