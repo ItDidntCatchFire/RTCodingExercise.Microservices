@@ -118,6 +118,7 @@ namespace Catalog.UnitTests
 
 			var expectedPlates = myEntities
 				.OrderBy(x => x.Id)
+				.Where(x => !x.IsReserved)
 				.Select(x => new
 				{
 					Registration = x.Registration,
