@@ -14,6 +14,8 @@
 
         public int Numbers { get; set; }
 
+        public bool IsReserved { get; set; }
+
 
 		public decimal CalculateSalesPrice()
 		{
