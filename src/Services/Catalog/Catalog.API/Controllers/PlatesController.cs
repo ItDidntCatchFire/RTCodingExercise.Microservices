@@ -28,10 +28,36 @@ public class PlatesController : Controller
 			{
 				Registration = x.Registration,
 				PurchasePrice = x.PurchasePrice,
-				SalePrice = x.CalculateSalesPrice()
+				SalePrice = x.CalculateSalesPrice(),
+				Reserved = x.IsReserved,
 			});
 
 		return Ok(plates);
+	}
+
+	[HttpPatch("ReservePlate")]
+	public async Task<IActionResult> ReservePlate(Guid plateId)
+	{
+		var plate = dbContext.Plates.FirstOrDefault(x => x.Id == plateId);
+		if (plate == default)
+			return BadRequest("Plate doesn't exist");
+
+		if (plate.IsReserved)
+			return BadRequest("Plate is already reserved");
+
+		plate.IsReserved = true;
+
+		try
+		{
+			await dbContext.SaveChangesAsync();
+		}
+		catch (Exception ex)
+		{
+			Log.Logger.Error(ex, "Failed to reserve plate");
+			return BadRequest("Failed to update record");
+		}
+
+		return Ok();
 	}
 
 
