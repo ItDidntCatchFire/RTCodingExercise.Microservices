@@ -13,5 +13,11 @@
         public string? Letters { get; set; }
 
         public int Numbers { get; set; }
-    }
+
+
+		public decimal CalculateSalesPrice()
+		{
+			return SalePrice * 1.2m;
+		}
+	}
 }
