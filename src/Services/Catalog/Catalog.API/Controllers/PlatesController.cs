@@ -16,7 +16,7 @@ public class PlatesController : Controller
 	}
 
 	[HttpGet("GetPlates")]
-	public IActionResult GetPlates(int page = 0, string orderBy = "id", bool orderAscending = true, int age = -1, string? initials = null)
+	public IActionResult GetPlates(int page = 0, string orderBy = "id", bool orderAscending = true, int age = -1, string? initials = null, string discountCode = "")
 	{
 		var plates =
 			(orderAscending ? dbContext.Plates.OrderBy(SortBy(orderBy)) : dbContext.Plates.OrderByDescending(SortBy(orderBy)))
@@ -29,7 +29,7 @@ public class PlatesController : Controller
 			{
 				Registration = x.Registration,
 				PurchasePrice = x.PurchasePrice,
-				SalePrice = x.CalculateSalesPrice(),
+				SalePrice = x.CalculateSalesPrice(discountCode),
 				Reserved = x.IsReserved,
 			});
 
