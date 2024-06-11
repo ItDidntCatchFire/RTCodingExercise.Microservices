@@ -22,10 +22,22 @@ namespace RTCodingExercise.Microservices.Controllers
 
 			return View(plates);
         }
+        
+        [HttpPost("Reserve")]
+        public IActionResult Reserve(Guid id)
+        {
+            return Ok("Reserved");
+        }
+
+        [HttpPost("Purchase")]
+        public IActionResult Purchase(Guid id)
+        { 
+            return Ok("Purchase");
+        }
 
         public async Task<ICollection<Plate>> GetPlates()
         {
-            var response = await _publishEndpoint.GetResponse<ICollection<Plate>>(new
+            var response = await _publishEndpoint.GetResponse<Plate[]>(new
             {
                 PageNumber = 0
             });
@@ -34,6 +46,21 @@ namespace RTCodingExercise.Microservices.Controllers
 
             return temp;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         public IActionResult Privacy()
         {
