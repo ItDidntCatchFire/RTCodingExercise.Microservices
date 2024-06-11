@@ -6,5 +6,33 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
+
+<div class="row">
+    <table class="arrowes-table table-striped">
+        <thead>
+            <tr>
+                <th>Registration</th>
+                <th>PurchasePrice</th>
+                <th>SalePrice</th>
+                <th>Status</th>
+                <th>Purchase?</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var plate in Model)
+            {
+                <tr>
+                    <td>@plate.Registration</td>
+                    <td>@plate.PurchasePrice</td>
+                    <td>@plate.SalePrice</td>
+                    <td>Reserve</td>
+                    <td>Purchase</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
