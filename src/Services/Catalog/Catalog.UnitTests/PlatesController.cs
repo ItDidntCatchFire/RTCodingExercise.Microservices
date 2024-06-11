@@ -564,6 +564,58 @@ namespace Catalog.UnitTests
 			Assert.Equal("Plate is already reserved", badRequestResult.Value);
 		}
 
+		[Fact]
+		public async void ReservePlate_AlreadySold()
+		{
+			var plateId = Guid.Parse("0812851E-3EC3-4D12-BAF6-C9F0E6DC2F76");
+
+			// Initialize a list of MyEntity objects to back the DbSet with.
+			var myEntities = new List<Domain.Plate>()
+			{
+				new Domain.Plate() {
+					Id = plateId,
+					Registration = "T44GUE",
+					PurchasePrice = 2722.51m,
+					SalePrice = 8995.00m,
+					Numbers = 44,
+					Letters = "TAG",
+					Status = PlateStatus.Sold,
+			}, new Domain.Plate() {
+					Id = Guid.Parse("DF81D7FC-319B-46A8-AB66-2574B4169C3D"),
+					Registration = "M44BEY",
+					PurchasePrice = 859.10m,
+					SalePrice = 8995.00m,
+					Numbers = 44,
+					Letters = "MAB"
+			}, new Domain.Plate() {
+					Id = Guid.Parse("0E9C83BF-94E2-484A-97CB-A8B06E3410FD"),
+					Registration = "P777PER",
+					PurchasePrice = 1494.08m,
+					SalePrice = 4995.00m,
+					Numbers = 777,
+					Letters = "PYP"
+				}
+			};
+
+			// Create a mock DbContext.
+			var dbContext = new Mock<ApplicationDbContext>();
+
+			// Create a mock DbSet.
+			var dbSet = MockDbSetFactory.Create(myEntities);
+
+			// Set up the MyEntities property so it returns the mocked DbSet.
+			dbContext.Setup(o => o.Plates).Returns(dbSet.Object);
+
+			var platesController = new Catalog.API.Controllers.PlatesController(dbContext.Object);
+
+			var actualResult = await platesController.ReservePlate(plateId);
+
+			// assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(actualResult);
+			Assert.Equal(400, badRequestResult.StatusCode);
+			Assert.Equal("Plate is already sold", badRequestResult.Value);
+		}
+
 		[InlineData("0812851E-3EC3-4D12-BAF6-C9F0E6DC2F76")]
 		[InlineData("DF81D7FC-319B-46A8-AB66-2574B4169C3D")]
 		[InlineData("0E9C83BF-94E2-484A-97CB-A8B06E3410FD")]
@@ -615,6 +667,160 @@ namespace Catalog.UnitTests
 			var okResult = Assert.IsType<OkResult>(actualResult);
 			Assert.Equal(200, okResult.StatusCode);
 			
+		}
+
+		[Fact]
+		public async void PurchasePlate_NotFound()
+		{
+			// Initialize a list of MyEntity objects to back the DbSet with.
+			var myEntities = new List<Domain.Plate>()
+			{
+				new Domain.Plate() {
+					Id = Guid.Parse("0812851E-3EC3-4D12-BAF6-C9F0E6DC2F76"),
+					Registration = "T44GUE",
+					PurchasePrice = 2722.51m,
+					SalePrice = 8995.00m,
+					Numbers = 44,
+					Letters = "TAG"
+			}, new Domain.Plate() {
+					Id = Guid.Parse("DF81D7FC-319B-46A8-AB66-2574B4169C3D"),
+					Registration = "M44BEY",
+					PurchasePrice = 859.10m,
+					SalePrice = 8995.00m,
+					Numbers = 44,
+					Letters = "MAB"
+			}, new Domain.Plate() {
+					Id = Guid.Parse("0E9C83BF-94E2-484A-97CB-A8B06E3410FD"),
+					Registration = "P777PER",
+					PurchasePrice = 1494.08m,
+					SalePrice = 4995.00m,
+					Numbers = 777,
+					Letters = "PYP"
+				}
+			};
+
+			// Create a mock DbContext.
+			var dbContext = new Mock<ApplicationDbContext>();
+
+			// Create a mock DbSet.
+			var dbSet = MockDbSetFactory.Create(myEntities);
+
+			// Set up the MyEntities property so it returns the mocked DbSet.
+			dbContext.Setup(o => o.Plates).Returns(dbSet.Object);
+
+			var platesController = new Catalog.API.Controllers.PlatesController(dbContext.Object);
+
+			var actualResult = await platesController.PurchasePlate(Guid.NewGuid());
+
+			// assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(actualResult);
+			Assert.Equal(400, badRequestResult.StatusCode);
+			Assert.Equal("Plate doesn't exist", badRequestResult.Value);
+		}
+
+		[Fact]
+		public async void PurchasePlate_AlreadySold()
+		{
+			var plateId = Guid.Parse("0812851E-3EC3-4D12-BAF6-C9F0E6DC2F76");
+
+			// Initialize a list of MyEntity objects to back the DbSet with.
+			var myEntities = new List<Domain.Plate>()
+			{
+				new Domain.Plate() {
+					Id = plateId,
+					Registration = "T44GUE",
+					PurchasePrice = 2722.51m,
+					SalePrice = 8995.00m,
+					Numbers = 44,
+					Letters = "TAG",
+					Status = PlateStatus.Sold,
+			}, new Domain.Plate() {
+					Id = Guid.Parse("DF81D7FC-319B-46A8-AB66-2574B4169C3D"),
+					Registration = "M44BEY",
+					PurchasePrice = 859.10m,
+					SalePrice = 8995.00m,
+					Numbers = 44,
+					Letters = "MAB"
+			}, new Domain.Plate() {
+					Id = Guid.Parse("0E9C83BF-94E2-484A-97CB-A8B06E3410FD"),
+					Registration = "P777PER",
+					PurchasePrice = 1494.08m,
+					SalePrice = 4995.00m,
+					Numbers = 777,
+					Letters = "PYP"
+				}
+			};
+
+			// Create a mock DbContext.
+			var dbContext = new Mock<ApplicationDbContext>();
+
+			// Create a mock DbSet.
+			var dbSet = MockDbSetFactory.Create(myEntities);
+
+			// Set up the MyEntities property so it returns the mocked DbSet.
+			dbContext.Setup(o => o.Plates).Returns(dbSet.Object);
+
+			var platesController = new Catalog.API.Controllers.PlatesController(dbContext.Object);
+
+			var actualResult = await platesController.PurchasePlate(plateId);
+
+			// assert
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(actualResult);
+			Assert.Equal(400, badRequestResult.StatusCode);
+			Assert.Equal("Plate is already sold", badRequestResult.Value);
+		}
+
+		[InlineData("0812851E-3EC3-4D12-BAF6-C9F0E6DC2F76")]
+		[InlineData("DF81D7FC-319B-46A8-AB66-2574B4169C3D")]
+		[InlineData("0E9C83BF-94E2-484A-97CB-A8B06E3410FD")]
+		[Theory]
+		public async void PurchasePlate_Update(string id)
+		{
+			var plateId = Guid.Parse(id);
+			// Initialize a list of MyEntity objects to back the DbSet with.
+			var myEntities = new List<Domain.Plate>()
+			{
+				new Domain.Plate() {
+					Id = Guid.Parse("0812851E-3EC3-4D12-BAF6-C9F0E6DC2F76"),
+					Registration = "T44GUE",
+					PurchasePrice = 2722.51m,
+					SalePrice = 8995.00m,
+					Numbers = 44,
+					Letters = "TAG"
+			}, new Domain.Plate() {
+					Id = Guid.Parse("DF81D7FC-319B-46A8-AB66-2574B4169C3D"),
+					Registration = "M44BEY",
+					PurchasePrice = 859.10m,
+					SalePrice = 8995.00m,
+					Numbers = 44,
+					Letters = "MAB"
+			}, new Domain.Plate() {
+					Id = Guid.Parse("0E9C83BF-94E2-484A-97CB-A8B06E3410FD"),
+					Registration = "P777PER",
+					PurchasePrice = 1494.08m,
+					SalePrice = 4995.00m,
+					Numbers = 777,
+					Letters = "PYP",
+					Status = PlateStatus.Reserved
+				}
+			};
+
+			// Create a mock DbContext.
+			var dbContext = new Mock<ApplicationDbContext>();
+
+			// Create a mock DbSet.
+			var dbSet = MockDbSetFactory.Create(myEntities);
+
+			// Set up the MyEntities property so it returns the mocked DbSet.
+			dbContext.Setup(o => o.Plates).Returns(dbSet.Object);
+
+			var platesController = new Catalog.API.Controllers.PlatesController(dbContext.Object);
+
+			var actualResult = await platesController.PurchasePlate(plateId);
+
+			// assert
+			var okResult = Assert.IsType<OkResult>(actualResult);
+			Assert.Equal(200, okResult.StatusCode);
 		}
 
 		private List<Domain.Plate> OrderByGenerator(List<Domain.Plate> plates, string orderBy, bool asc)

@@ -46,6 +46,9 @@ public class PlatesController : Controller
 		if (plate.Status == PlateStatus.Reserved)
 			return BadRequest("Plate is already reserved");
 
+		if (plate.Status == PlateStatus.Sold)
+			return BadRequest("Plate is already sold");
+
 		plate.Status = PlateStatus.Reserved;
 
 		try
@@ -55,6 +58,31 @@ public class PlatesController : Controller
 		catch (Exception ex)
 		{
 			Log.Logger.Error(ex, "Failed to reserve plate");
+			return BadRequest("Failed to update record");
+		}
+
+		return Ok();
+	}
+
+	[HttpPatch("PurchasePlate")]
+	public async Task<IActionResult> PurchasePlate(Guid plateId)
+	{
+		var plate = dbContext.Plates.FirstOrDefault(x => x.Id == plateId);
+		if (plate == default)
+			return BadRequest("Plate doesn't exist");
+
+		if (plate.Status == PlateStatus.Sold)
+			return BadRequest("Plate is already sold");
+
+		plate.Status = PlateStatus.Sold;
+
+		try
+		{
+			await dbContext.SaveChangesAsync();
+		}
+		catch (Exception ex)
+		{
+			Log.Logger.Error(ex, "Failed to sell plate");
 			return BadRequest("Failed to update record");
 		}
 
