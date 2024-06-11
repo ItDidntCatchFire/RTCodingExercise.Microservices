@@ -62,7 +62,7 @@ namespace Catalog.UnitTests
 					Registration = x.Registration,
 					PurchasePrice = x.PurchasePrice,
 					SalePrice = x.CalculateSalesPrice(),
-					Reserved = x.IsReserved,
+					Status = x.Status,
 				});
 
 			// assert
@@ -85,7 +85,7 @@ namespace Catalog.UnitTests
 					SalePrice = 8995.00m,
 					Numbers = 44,
 					Letters = "TAG",
-					IsReserved = true
+					Status = PlateStatus.Reserved
 			}, new Domain.Plate() {
 					Id = Guid.Parse("DF81D7FC-319B-46A8-AB66-2574B4169C3D"),
 					Registration = "M44BEY",
@@ -118,13 +118,13 @@ namespace Catalog.UnitTests
 
 			var expectedPlates = myEntities
 				.OrderBy(x => x.Id)
-				.Where(x => !x.IsReserved)
+				.Where(x => x.Status != PlateStatus.Reserved)
 				.Select(x => new
 				{
 					Registration = x.Registration,
 					PurchasePrice = x.PurchasePrice,
 					SalePrice = x.CalculateSalesPrice(),
-					Reserved = x.IsReserved,
+					Status = x.Status,
 				});
 
 			// assert
@@ -184,7 +184,7 @@ namespace Catalog.UnitTests
 					Registration = x.Registration,
 					PurchasePrice = x.PurchasePrice,
 					SalePrice = x.CalculateSalesPrice(),
-					Reserved = x.IsReserved,
+					Status = x.Status,
 				});
 
 			// assert
@@ -213,7 +213,7 @@ namespace Catalog.UnitTests
 					Registration = x.Registration,
 					PurchasePrice = x.PurchasePrice,
 					SalePrice = x.CalculateSalesPrice(),
-					Reserved = x.IsReserved,
+					Status = x.Status,
 				});
 
 
@@ -261,7 +261,7 @@ namespace Catalog.UnitTests
 				   Registration = x.Registration,
 				   PurchasePrice = x.PurchasePrice,
 				   SalePrice = x.CalculateSalesPrice(),
-				   Reserved = x.IsReserved,
+				   Status = x.Status,
 			   });
 
 			// assert
@@ -307,7 +307,7 @@ namespace Catalog.UnitTests
 				   Registration = x.Registration,
 				   PurchasePrice = x.PurchasePrice,
 				   SalePrice = x.CalculateSalesPrice(),
-				   Reserved = x.IsReserved,
+				   Status = x.Status,
 			   });
 
 			// assert
@@ -376,7 +376,7 @@ namespace Catalog.UnitTests
 					Registration = x.Registration,
 					PurchasePrice = x.PurchasePrice,
 					SalePrice = x.CalculateSalesPrice(),
-					Reserved = x.IsReserved,
+					Status = x.Status,
 				});
 
 			// assert
@@ -453,7 +453,7 @@ namespace Catalog.UnitTests
 					Registration = x.Registration,
 					PurchasePrice = x.PurchasePrice,
 					SalePrice = x.CalculateSalesPrice(),
-					Reserved = x.IsReserved,
+					Status = x.Status,
 				});
 
 			// assert
@@ -527,7 +527,7 @@ namespace Catalog.UnitTests
 					SalePrice = 8995.00m,
 					Numbers = 44,
 					Letters = "TAG",
-					IsReserved = true,
+					Status = PlateStatus.Reserved,
 			}, new Domain.Plate() {
 					Id = Guid.Parse("DF81D7FC-319B-46A8-AB66-2574B4169C3D"),
 					Registration = "M44BEY",

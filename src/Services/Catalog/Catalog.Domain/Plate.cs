@@ -14,7 +14,7 @@
 
 		public int Numbers { get; set; }
 
-		public bool IsReserved { get; set; }
+		public PlateStatus Status { get; set; }
 
 
 		public decimal CalculateSalesPrice(string discountCode = "")
@@ -32,5 +32,12 @@
 
 			return salePrice;
 		}
+	}
+
+	public enum PlateStatus
+	{
+		Available,
+		Reserved,
+		Sold
 	}
 }

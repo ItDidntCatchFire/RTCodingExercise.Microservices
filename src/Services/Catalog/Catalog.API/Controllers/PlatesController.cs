@@ -22,7 +22,7 @@ public class PlatesController : Controller
 			(orderAscending ? dbContext.Plates.OrderBy(SortBy(orderBy)) : dbContext.Plates.OrderByDescending(SortBy(orderBy)))
 			.ThenBy(x => x.Id)
 			.Where(FilterBy(age, initials))
-			.Where(x => !x.IsReserved)
+			.Where(x => x.Status != PlateStatus.Reserved)
 			.Skip(page * NUMBER_OF_PLATES)
 			.Take(NUMBER_OF_PLATES)
 			.Select(x => new
@@ -30,7 +30,7 @@ public class PlatesController : Controller
 				Registration = x.Registration,
 				PurchasePrice = x.PurchasePrice,
 				SalePrice = x.CalculateSalesPrice(discountCode),
-				Reserved = x.IsReserved,
+				Status = x.Status,
 			});
 
 		return Ok(plates);
@@ -43,10 +43,10 @@ public class PlatesController : Controller
 		if (plate == default)
 			return BadRequest("Plate doesn't exist");
 
-		if (plate.IsReserved)
+		if (plate.Status == PlateStatus.Reserved)
 			return BadRequest("Plate is already reserved");
 
-		plate.IsReserved = true;
+		plate.Status = PlateStatus.Reserved;
 
 		try
 		{
