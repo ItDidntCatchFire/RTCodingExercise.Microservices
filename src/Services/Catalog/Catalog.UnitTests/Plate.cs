@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using Catalog.Domain;
+using Xunit;
 
 namespace Catalog.UnitTests
 {
@@ -23,6 +24,7 @@ namespace Catalog.UnitTests
 		[InlineData(0)]
 		[InlineData(10)]
 		[InlineData(100)]
+		[InlineData(200)]
 		[Theory]
 		public void CalculateSalesPrice_DISCOUNT(decimal price)
 		{
@@ -31,7 +33,7 @@ namespace Catalog.UnitTests
 				SalePrice = price
 			};
 
-			var expectedValue = (price * 1.2m) - 25;
+			var expectedValue = price - 25;
 			var actualValue = plate.CalculateSalesPrice("DISCOUNT");
 
 			Assert.Equal(expectedValue, actualValue);
@@ -48,9 +50,24 @@ namespace Catalog.UnitTests
 				SalePrice = price
 			};
 
-			var expectedValue = (price * 1.2m) * 0.85m;
+			var expectedValue = price * 0.85m;
 			var actualValue = plate.CalculateSalesPrice("PERCENTOFF");
 
+			Assert.Equal(expectedValue, actualValue);
+		}
+
+		[Fact]
+		public void IsPriceTooLow_DISCOUNT()
+		{
+			var plate = new Domain.Plate()
+			{
+				SalePrice = 200
+			};
+			var expectedValue = true;
+
+			var salePrice = plate.CalculateSalesPrice("DISCOUNT");
+			var actualValue = plate.IsPriceTooLow(salePrice);
+			
 			Assert.Equal(expectedValue, actualValue);
 		}
 	}
