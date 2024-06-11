@@ -22,7 +22,7 @@ public class PlatesController : Controller
 			(orderAscending ? dbContext.Plates.OrderBy(SortBy(orderBy)) : dbContext.Plates.OrderByDescending(SortBy(orderBy)))
 			.ThenBy(x => x.Id)
 			.Where(FilterBy(age, initials))
-			.Where(x => !x.IsReserved)
+			.Where(x => x.Status != PlateStatus.Reserved)
 			.Skip(page * NUMBER_OF_PLATES)
 			.Take(NUMBER_OF_PLATES)
 			.Select(x => new
@@ -30,7 +30,7 @@ public class PlatesController : Controller
 				Registration = x.Registration,
 				PurchasePrice = x.PurchasePrice,
 				SalePrice = x.CalculateSalesPrice(discountCode),
-				Reserved = x.IsReserved,
+				Status = x.Status,
 			});
 
 		return Ok(plates);
@@ -43,10 +43,13 @@ public class PlatesController : Controller
 		if (plate == default)
 			return BadRequest("Plate doesn't exist");
 
-		if (plate.IsReserved)
+		if (plate.Status == PlateStatus.Reserved)
 			return BadRequest("Plate is already reserved");
 
-		plate.IsReserved = true;
+		if (plate.Status == PlateStatus.Sold)
+			return BadRequest("Plate is already sold");
+
+		plate.Status = PlateStatus.Reserved;
 
 		try
 		{
@@ -55,6 +58,31 @@ public class PlatesController : Controller
 		catch (Exception ex)
 		{
 			Log.Logger.Error(ex, "Failed to reserve plate");
+			return BadRequest("Failed to update record");
+		}
+
+		return Ok();
+	}
+
+	[HttpPatch("PurchasePlate")]
+	public async Task<IActionResult> PurchasePlate(Guid plateId)
+	{
+		var plate = dbContext.Plates.FirstOrDefault(x => x.Id == plateId);
+		if (plate == default)
+			return BadRequest("Plate doesn't exist");
+
+		if (plate.Status == PlateStatus.Sold)
+			return BadRequest("Plate is already sold");
+
+		plate.Status = PlateStatus.Sold;
+
+		try
+		{
+			await dbContext.SaveChangesAsync();
+		}
+		catch (Exception ex)
+		{
+			Log.Logger.Error(ex, "Failed to sell plate");
 			return BadRequest("Failed to update record");
 		}
 
