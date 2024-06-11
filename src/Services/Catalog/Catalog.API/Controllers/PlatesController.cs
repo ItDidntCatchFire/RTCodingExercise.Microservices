@@ -65,7 +65,7 @@ public class PlatesController : Controller
 	}
 
 	[HttpPatch("PurchasePlate")]
-	public async Task<IActionResult> PurchasePlate(Guid plateId)
+	public async Task<IActionResult> PurchasePlate(Guid plateId, string discountCode = "")
 	{
 		var plate = dbContext.Plates.FirstOrDefault(x => x.Id == plateId);
 		if (plate == default)
@@ -73,6 +73,10 @@ public class PlatesController : Controller
 
 		if (plate.Status == PlateStatus.Sold)
 			return BadRequest("Plate is already sold");
+
+		var salePrice = plate.CalculateSalesPrice(discountCode);
+		if (plate.IsPriceTooLow(salePrice))
+			return BadRequest($"Code {discountCode} cannot be applied to this item");
 
 		plate.Status = PlateStatus.Sold;
 

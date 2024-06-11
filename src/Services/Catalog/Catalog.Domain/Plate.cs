@@ -19,19 +19,17 @@
 
 		public decimal CalculateSalesPrice(string discountCode = "")
 		{
-			var salePrice = SalePrice * 1.2m;
-
-			if (string.IsNullOrEmpty(discountCode))
-				return salePrice;
-
 			if (discountCode == "DISCOUNT")
-				return salePrice - 25;
+				return SalePrice - 25;
 
 			if (discountCode == "PERCENTOFF")
-				return salePrice * 0.85m;
+				return SalePrice * 0.85m;
 
-			return salePrice;
+			return SalePrice * 1.2m;
 		}
+
+		public bool IsPriceTooLow(decimal price)
+			=> price <= (0.9m * SalePrice);
 	}
 
 	public enum PlateStatus
