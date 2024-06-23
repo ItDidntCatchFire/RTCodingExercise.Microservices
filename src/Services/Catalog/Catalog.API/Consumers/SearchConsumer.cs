@@ -1,6 +1,5 @@
 ﻿using IntegrationEvents;
 using MassTransit;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Linq.Expressions;
 
 namespace Catalog.API.Consumers
@@ -8,11 +7,11 @@ namespace Catalog.API.Consumers
     public class SearchConsumer : IConsumer<SearchEvent>
     {
         private const int NUMBER_OF_PLATES = 20;
-        public ApplicationDbContext dbContext;
+        public ApplicationDbContext _dbContext;
 
         public SearchConsumer(ApplicationDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task Consume(ConsumeContext<SearchEvent> context)
@@ -20,7 +19,7 @@ namespace Catalog.API.Consumers
             var values = context.Message;
 
             var plates =
-            (values.OrderAscending ? dbContext.Plates.OrderBy(SortBy(values.OrderBy)) : dbContext.Plates.OrderByDescending(SortBy(values.OrderBy)))
+            (values.OrderAscending ? _dbContext.Plates.OrderBy(SortBy(values.OrderBy)) : _dbContext.Plates.OrderByDescending(SortBy(values.OrderBy)))
             .ThenBy(x => x.Id)
             .Where(FilterBy(values.Age, values.Initials))
             .Where(x => x.Status != PlateStatus.Reserved)
