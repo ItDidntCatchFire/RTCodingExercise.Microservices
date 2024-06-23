@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Net;
 
 namespace Catalog.API.Controllers;
 
@@ -8,18 +9,18 @@ public class PlatesController : Controller
 {
 	private const int NUMBER_OF_PLATES = 20;
 
-	public ApplicationDbContext dbContext;
+	public ApplicationDbContext _dbContext;
 
-	public PlatesController(ApplicationDbContext _context)
+	public PlatesController(ApplicationDbContext context)
 	{
-		dbContext = _context;
+		_dbContext = context;
 	}
 
 	[HttpGet("GetPlates")]
 	public IActionResult GetPlates(int page = 0, string orderBy = "id", bool orderAscending = true, int age = -1, string? initials = null, string discountCode = "")
 	{
 		var plates =
-			(orderAscending ? dbContext.Plates.OrderBy(SortBy(orderBy)) : dbContext.Plates.OrderByDescending(SortBy(orderBy)))
+			(orderAscending ? _dbContext.Plates.OrderBy(SortBy(orderBy)) : _dbContext.Plates.OrderByDescending(SortBy(orderBy)))
 			.ThenBy(x => x.Id)
 			.Where(FilterBy(age, initials))
 			.Where(x => x.Status != PlateStatus.Reserved)
@@ -39,7 +40,7 @@ public class PlatesController : Controller
 	[HttpPatch("ReservePlate")]
 	public async Task<IActionResult> ReservePlate(Guid plateId)
 	{
-		var plate = dbContext.Plates.FirstOrDefault(x => x.Id == plateId);
+		var plate = _dbContext.Plates.FirstOrDefault(x => x.Id == plateId);
 		if (plate == default)
 			return BadRequest("Plate doesn't exist");
 
@@ -53,7 +54,7 @@ public class PlatesController : Controller
 
 		try
 		{
-			await dbContext.SaveChangesAsync();
+			await _dbContext.SaveChangesAsync();
 		}
 		catch (Exception ex)
 		{
@@ -67,7 +68,7 @@ public class PlatesController : Controller
 	[HttpPatch("PurchasePlate")]
 	public async Task<IActionResult> PurchasePlate(Guid plateId, string discountCode = "")
 	{
-		var plate = dbContext.Plates.FirstOrDefault(x => x.Id == plateId);
+		var plate = _dbContext.Plates.FirstOrDefault(x => x.Id == plateId);
 		if (plate == default)
 			return BadRequest("Plate doesn't exist");
 
@@ -82,7 +83,7 @@ public class PlatesController : Controller
 
 		try
 		{
-			await dbContext.SaveChangesAsync();
+			await _dbContext.SaveChangesAsync();
 		}
 		catch (Exception ex)
 		{
@@ -93,6 +94,27 @@ public class PlatesController : Controller
 		return Ok();
 	}
 
+	[HttpPost("CreatePlate")] 
+	public async Task<IActionResult> CreatePlate(Plate plate)
+	{
+        //validate Plate
+
+        //if invalid return BadRequest
+
+        //if valid
+        _dbContext.Plates.Add(plate);
+		try
+		{
+            _dbContext.SaveChanges();
+        }
+		catch (Exception ex)
+		{
+            Log.Logger.Error(ex, "Failed to create plate");
+            return BadRequest("Failed to create plate");
+        }
+
+        return StatusCode(StatusCodes.Status201Created, plate);
+    }
 
 	private Expression<Func<Plate, object>> SortBy(string property)
 	{
