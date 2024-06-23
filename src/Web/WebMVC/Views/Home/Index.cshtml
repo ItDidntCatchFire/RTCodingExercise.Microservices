@@ -28,32 +28,32 @@
                     <td>@plate.Registration</td>
                     <td>@plate.PurchasePrice</td>
                     <td>@plate.SalePrice</td>
-                    <td>
-                        <form action="Reserve" method="post">
-                            <input hidden="hidden" type="text" value="@plate.Id" name="id" />
-                            <button>
-                                <input type="submit" value="Reserve">
-                            </button>
-                        </form>
-                    </td>
-                    <td>
-                        <form action="Purchase" method="post">
-                            <input hidden="hidden" type="text" value="@plate.Id" name="id" />
-                            <button>
-                                <input type="submit" value="Purchase">
-                            </button>
-                        </form>
-                    </td>
+                    @if (plate.Status == Catalog.Domain.PlateStatus.Sold)
+                    {
+                        <td></td>
+                        <td></td>
+                    }
+                    else
+                    {
+                        <td>
+                            <form action="Reserve" method="post">
+                                <input hidden="hidden" type="text" value="@plate.Id" name="id" />
+                                <button>
+                                    <input type="submit" value="Reserve">
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <form action="Purchase" method="post">
+                                <input hidden="hidden" type="text" value="@plate.Id" name="id" />
+                                <button>
+                                    <input type="submit" value="Purchase">
+                                </button>
+                            </form>
+                        </td>
+                    }
                 </tr>
             }
         </tbody>
-
-
-@*         <form action="Purchase" method="get">
-            <input hidden="hidden" type="text" value="@plate.Id" name="id" />
-            <button>
-                <input type="submit" value="Purchase">
-            </button>
-        </form> *@
     </table>
 </div>

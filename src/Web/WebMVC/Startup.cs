@@ -25,7 +25,10 @@ namespace RTCodingExercise.WebMVC
                 //x.AddConsumer<ConsumerClass>();
 
                 x.AddRequestClient<SearchEvent>();
-                
+                x.AddRequestClient<ReservePlate>();
+                x.AddRequestClient<SellPlate>();
+
+
                 //ADD CONSUMERS HERE
                 x.UsingRabbitMq((context, cfg) =>
                 {

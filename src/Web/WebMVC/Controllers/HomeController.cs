@@ -8,12 +8,15 @@ namespace RTCodingExercise.Microservices.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IRequestClient<SearchEvent> _publishEndpoint;
+        private readonly IRequestClient<SearchEvent> _searchEndpoint;
+        private readonly IPublishEndpoint _reserveEndpoint;
 
-        public HomeController(IRequestClient<SearchEvent> publishEndpoint, ILogger<HomeController> logger)
+
+        public HomeController(IRequestClient<SearchEvent> publishEndpoint, ILogger<HomeController> logger, IPublishEndpoint reserveEndpoint)
         {
             _logger = logger;
-            _publishEndpoint  = publishEndpoint;
+            _searchEndpoint = publishEndpoint;
+            _reserveEndpoint = reserveEndpoint;
         }
 
         public async Task<IActionResult> Index(int pageNumber = 0)
@@ -24,23 +27,34 @@ namespace RTCodingExercise.Microservices.Controllers
         }
         
         [HttpPost("Reserve")]
-        public IActionResult Reserve(Guid id)
+        public async Task<IActionResult> Reserve(Guid id)
         {
-            return Ok("Reserved");
+            await _reserveEndpoint.Publish<ReservePlate>(new
+            {
+                PlateId = id,
+            });
+
+            //persist the query data from previous index
+            return RedirectToAction("Index");
         }
 
         [HttpPost("Purchase")]
-        public IActionResult Purchase(Guid id)
-        { 
-            return Ok("Purchase");
+        public async Task<IActionResult> Purchase(Guid id)
+        {
+            await _reserveEndpoint.Publish<SellPlate>(new
+            {
+                PlateId = id,
+            });
+
+            //persist the query data from previous index
+            return RedirectToAction("Index");
         }
 
         public async Task<ICollection<Plate>> GetPlates(int pageNumber)
         {
-            var response = await _publishEndpoint.GetResponse<Plate[]>(new
+            var response = await _searchEndpoint.GetResponse<Plate[]>(new
             {
                 PageNumber = pageNumber,
-                
             });
 
             var message = response.Message;

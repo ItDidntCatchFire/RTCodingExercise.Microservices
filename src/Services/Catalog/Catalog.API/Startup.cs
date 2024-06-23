@@ -54,6 +54,8 @@ namespace Catalog.API
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<SearchConsumer>();
+                x.AddConsumer<ReserveConsumer>();
+                x.AddConsumer<SellConsumer>();
 
                 //ADD CONSUMERS HERE
                 x.UsingRabbitMq((context, cfg) =>
