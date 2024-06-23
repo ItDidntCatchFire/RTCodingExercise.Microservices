@@ -41,6 +41,7 @@ namespace WebMVC.Controllers
                 return View("Index");
             }
 
+            TempData["success"] = "New plate added";
             return View("Index");
         }
     }
