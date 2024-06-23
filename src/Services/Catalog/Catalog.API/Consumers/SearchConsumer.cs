@@ -53,13 +53,13 @@ namespace Catalog.API.Consumers
         private Expression<Func<Plate, bool>> FilterBy(int age, string initials)
         {
             if (age > -1 && initials != null && !string.IsNullOrEmpty(initials.Trim()))
-                return (x => x.Numbers == age && x.Letters.ToLower() == initials.Trim().ToLower());
+                return (x => x.Numbers == age && x.Letters.ToLower().Contains(initials.Trim().ToLower()));
 
             if (age > -1)
                 return (x => x.Numbers == age);
 
             if (initials != null && !string.IsNullOrEmpty(initials.Trim()))
-                return (x => x.Letters.ToLower() == initials.Trim().ToLower());
+                return (x => x.Letters.ToLower().Contains(initials.Trim().ToLower()));
 
             return (x => true);
         }

@@ -2,6 +2,7 @@
 using MassTransit;
 using RTCodingExercise.Microservices.Models;
 using System.Diagnostics;
+using WebMVC.Models;
 
 namespace RTCodingExercise.Microservices.Controllers
 {
@@ -19,11 +20,24 @@ namespace RTCodingExercise.Microservices.Controllers
             _publishEndpoint = publishEndpoint;
         }
 
-        public async Task<IActionResult> Index(int pageNumber = 0)
+        public async Task<IActionResult> Index(string orderby, int age = -1, string initials = "", int pageNumber = 0, string discountCode = "")
         {
-            var plates = await GetPlates(pageNumber);
+            if (pageNumber < 0)
+                pageNumber = 0;
 
-			return View(plates);
+            var plates = await GetPlates(pageNumber, age, initials, orderby, discountCode);
+
+            var model = new HomeModel()
+            {
+                Plates = plates,
+                Age = age > -1 ? age.ToString() : "",
+                Initials = initials,
+                PageNumber = pageNumber > -1 ? pageNumber.ToString() : "",
+                OrderBy = orderby, //TODO: Figure out how to bind the drop down to what is selected
+                DiscountCode = discountCode
+            };
+
+			return View(model);
         }
         
         [HttpPost("Reserve")]
@@ -50,11 +64,15 @@ namespace RTCodingExercise.Microservices.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<ICollection<Plate>> GetPlates(int pageNumber)
+        public async Task<ICollection<Plate>> GetPlates(int pageNumber, int age, string initials, string orderby, string discountCode)
         {
-            var response = await _searchEndpoint.GetResponse<Plate[]>(new
+            var response = await _searchEndpoint.GetResponse<Plate[]>(new SearchEvent
             {
                 PageNumber = pageNumber,
+                Age = age,
+                Initials = initials,
+                OrderBy = orderby,
+                DiscountCode = discountCode
             });
 
             var message = response.Message;
