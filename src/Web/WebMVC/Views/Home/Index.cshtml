@@ -1,10 +1,76 @@
-﻿@model List<Catalog.Domain.Plate>
+﻿@model WebMVC.Models.HomeModel
 
 @{
     ViewData["Title"] = "Home Page";
 }
 
+
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Browse our plates</h1>
+</div>
+
+<div>
+    <form>
+        Age: <input type="number" name="age" value="@Model.Age" />
+        Initials: <input type="text" name="initials" value="@Model.Initials" />
+        Page Number: <input type="text" name="pageNumber" value="@Model.PageNumber" />
+        <select name="orderBy" >
+            <option value="">Select a field to order by</option>
+            <option value="Registration">Registration</option>
+            <option value="Purchaseprice">Purchase price</option>
+            <option value="Saleprice">Sale price</option>
+        </select>
+        <p>
+            Discount Code: <input type="text" name="discountCode" value="@Model.DiscountCode" />
+        <button>
+            <input type="submit" value="Search">
+        </button>
+    </form>
+</div>
+
+<div class="row">
+    <table class="arrowes-table table-striped">
+        <thead>
+            <tr>
+                <th>Registration</th>
+                <th>PurchasePrice</th>
+                <th>SalePrice</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var plate in Model.Plates)
+            {
+                <tr>
+                    <td>@plate.Registration</td>
+                    <td>£@plate.PurchasePrice</td>
+                    <td>£@plate.SalePrice</td>
+                    @if (plate.Status == Catalog.Domain.PlateStatus.Sold)
+                    {
+                        <td></td>
+                        <td></td>
+                    }
+                    else
+                    {
+                        <td>
+                            <form action="Reserve" method="post">
+                                <input hidden="hidden" type="text" value="@plate.Id" name="id" />
+                                <button>
+                                    <input type="submit" value="Reserve">
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <form action="Purchase" method="post">
+                                <input hidden="hidden" type="text" value="@plate.Id" name="id" />
+                                <button>
+                                    <input type="submit" value="Purchase">
+                                </button>
+                            </form>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>

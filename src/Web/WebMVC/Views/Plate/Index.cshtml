@@ -1,0 +1,23 @@
+﻿@model Catalog.Domain.Plate
+
+
+@{
+    ViewData["Title"] = "Create plate";
+    
+}
+
+
+<div class="text-center">
+    <h1 class="display-4">Create a plate</h1>
+</div>
+
+<p style="color:red">@TempData["error"]</p>
+<p style="color:green">@TempData["success"]</p>
+
+<form action="Create" method="post">
+    <p>
+        Registration: <input type="text" asp-for="Registration" />
+        Purchase Price: <input type="text" asp-for="PurchasePrice" />
+        <input type="submit" value="Add" />
+    </p>
+</form>
