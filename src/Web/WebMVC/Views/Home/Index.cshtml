@@ -30,7 +30,7 @@
                     <td>@plate.SalePrice</td>
                     <td>
                         <form action="Reserve" method="post">
-                            <input hidden="hidden" type="text" value="@plate.Id" name="id"/>
+                            <input hidden="hidden" type="text" value="@plate.Id" name="id" />
                             <button>
                                 <input type="submit" value="Reserve">
                             </button>
@@ -47,5 +47,13 @@
                 </tr>
             }
         </tbody>
+
+
+@*         <form action="Purchase" method="get">
+            <input hidden="hidden" type="text" value="@plate.Id" name="id" />
+            <button>
+                <input type="submit" value="Purchase">
+            </button>
+        </form> *@
     </table>
 </div>

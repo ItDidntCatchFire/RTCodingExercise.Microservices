@@ -16,9 +16,9 @@ namespace RTCodingExercise.Microservices.Controllers
             _publishEndpoint  = publishEndpoint;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 0)
         {
-            var plates = await GetPlates();
+            var plates = await GetPlates(pageNumber);
 
 			return View(plates);
         }
@@ -35,32 +35,18 @@ namespace RTCodingExercise.Microservices.Controllers
             return Ok("Purchase");
         }
 
-        public async Task<ICollection<Plate>> GetPlates()
+        public async Task<ICollection<Plate>> GetPlates(int pageNumber)
         {
             var response = await _publishEndpoint.GetResponse<Plate[]>(new
             {
-                PageNumber = 0
+                PageNumber = pageNumber,
+                
             });
 
-            var temp = response.Message;
+            var message = response.Message;
 
-            return temp;
+            return message;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         public IActionResult Privacy()
         {
