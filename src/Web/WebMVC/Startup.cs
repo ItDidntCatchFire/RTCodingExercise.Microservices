@@ -27,6 +27,7 @@ namespace RTCodingExercise.WebMVC
                 x.AddRequestClient<SearchEvent>();
                 x.AddRequestClient<ReservePlate>();
                 x.AddRequestClient<SellPlate>();
+                x.AddRequestClient<CreatePlate>();
 
 
                 //ADD CONSUMERS HERE

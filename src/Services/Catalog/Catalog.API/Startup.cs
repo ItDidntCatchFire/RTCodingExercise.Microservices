@@ -56,6 +56,7 @@ namespace Catalog.API
                 x.AddConsumer<SearchConsumer>();
                 x.AddConsumer<ReserveConsumer>();
                 x.AddConsumer<SellConsumer>();
+                x.AddConsumer<CreateConsumer>();
 
                 //ADD CONSUMERS HERE
                 x.UsingRabbitMq((context, cfg) =>

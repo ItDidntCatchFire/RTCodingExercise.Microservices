@@ -9,14 +9,14 @@ namespace RTCodingExercise.Microservices.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IRequestClient<SearchEvent> _searchEndpoint;
-        private readonly IPublishEndpoint _reserveEndpoint;
+        private readonly IPublishEndpoint _publishEndpoint;
 
 
-        public HomeController(IRequestClient<SearchEvent> publishEndpoint, ILogger<HomeController> logger, IPublishEndpoint reserveEndpoint)
+        public HomeController(IRequestClient<SearchEvent> requestEndpoint, ILogger<HomeController> logger, IPublishEndpoint publishEndpoint)
         {
             _logger = logger;
-            _searchEndpoint = publishEndpoint;
-            _reserveEndpoint = reserveEndpoint;
+            _searchEndpoint = requestEndpoint;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<IActionResult> Index(int pageNumber = 0)
@@ -29,24 +29,24 @@ namespace RTCodingExercise.Microservices.Controllers
         [HttpPost("Reserve")]
         public async Task<IActionResult> Reserve(Guid id)
         {
-            await _reserveEndpoint.Publish<ReservePlate>(new
+            await _publishEndpoint.Publish<ReservePlate>(new
             {
                 PlateId = id,
             });
 
-            //persist the query data from previous index
+            //TODO: persist the query data from previous index
             return RedirectToAction("Index");
         }
 
         [HttpPost("Purchase")]
         public async Task<IActionResult> Purchase(Guid id)
         {
-            await _reserveEndpoint.Publish<SellPlate>(new
+            await _publishEndpoint.Publish<SellPlate>(new
             {
                 PlateId = id,
             });
 
-            //persist the query data from previous index
+            //TODO: persist the query data from previous index
             return RedirectToAction("Index");
         }
 
